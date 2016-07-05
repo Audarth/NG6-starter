@@ -1,3 +1,5 @@
+import searchResultsTemplate from './search-results.html';
+
 SearchCtrl.$inject = ['$scope', '$location', 'userService', 'MLSearchFactory'];
 
 // inherit from MLSearchController
@@ -10,6 +12,9 @@ function SearchCtrl($scope, $location, userService, searchFactory) {
   superCtrl.constructor.call(ctrl, $scope, $location, searchFactory.newContext());
 
   ctrl.init();
+
+  //retrieve and insert searchResults template
+  ctrl.searchResultsTemplate = searchResultsTemplate;
 
   ctrl.setSnippet = function(type) {
     ctrl.mlSearch.setSnippet(type);

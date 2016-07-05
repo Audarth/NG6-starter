@@ -236,7 +236,7 @@ function startBrowserSyncWebPack(env) {
     proxy: 'localhost:' + nodeOptions.env.APP_PORT,
     port: 3000,
     notify: true,
-    reloadDelay: 200, //1000
+    reloadDelay: 0, //1000
     ui: false,
     open: false,
     /*server: {

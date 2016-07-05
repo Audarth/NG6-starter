@@ -17,7 +17,7 @@
         <ml-snippet set-snippet="$ctrl.setSnippet(type)"></ml-snippet>
       </div>
       <ml-metrics search="$ctrl.response" ></ml-metrics>
-      <ml-results template="app/components/search/search-results.html" results="$ctrl.response.results"></ml-results>
+      <ml-results templateUrl="$ctrl.searchResultsTemplate" results="$ctrl.response.results"></ml-results>
     </div>
   </div>
 </div>

@@ -1,6 +1,4 @@
 import angular from 'angular';
-//run globally since not in a module
-import 'script!ng-toast';
 import ngSanitize from 'angular-sanitize';
 
 import UserService from './user.service';

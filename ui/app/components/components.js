@@ -4,13 +4,19 @@ import MessageBoard from './message-board/message-board';
 import Root from './root/root';
 import User from './user/user';
 import Search from './search/search';
+import ErrorModule from './error/error';
+import Detail from './detail/detail';
+import Create from './create/create';
 
 let componentModule = angular.module('app.components', [
   Login,
   MessageBoard,
   Root,
   User,
-  Search
+  Search,
+  ErrorModule,
+  Detail,
+  Create
 ])
 
 .name;

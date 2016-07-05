@@ -5,6 +5,9 @@ import 'script!ml-search-ng/dist/ml-search-ng-tpls';
 import 'script!ml-common-ng/dist/ml-common-ng';
 import 'script!ml-search-ng/dist/ml-search-ng';
 
+//run globally since not in a module
+import 'script!ng-toast';
+
 //import uiRouter from 'angular-ui-router';
 //import Common from './common/common';
 import Components from './components/components';

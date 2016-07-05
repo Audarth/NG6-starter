@@ -76,7 +76,7 @@ let routesModule = angular.module('app.router', [
         }
       })
       .state('root.view', {
-        url: '/detail{uri:path}',
+        url: '/detail?{uri:path}',
         params: {
           uri: {
             value: null
