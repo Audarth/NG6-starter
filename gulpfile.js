@@ -145,38 +145,6 @@ gulp.task('webpack', function(cb) {
   });
 });
 
-gulp.task('serve-webpack', function() {
-  var config = require('./webpack.dev.config');
-  config.entry.app = [
-    // this modules required to make HRM working
-    // it responsible for all this webpack magic
-    'webpack-hot-middleware/client?reload=true',
-    // application entry point
-  ].concat(paths.entry);
-
-  var compiler = webpack(config);
-
-  browserSync({
-    port: process.env.PORT || 3000,
-    open: false,
-    server: {
-      baseDir: root
-    },
-    middleware: [
-      historyApiFallback(),
-      webpackDevMiddelware(compiler, {
-        stats: {
-          colors: colorsSupported,
-          chunks: false,
-          modules: false
-        },
-        publicPath: config.output.publicPath
-      }),
-      webpachHotMiddelware(compiler)
-    ]
-  });
-});
-
 gulp.task('serve', function() {
 
   var env = 'local';
