@@ -126,7 +126,7 @@ var paths = {
 
 
 // use webpack.config.js to build modules
-gulp.task('webpack', ['clean'], function(cb) {
+gulp.task('webpack', function(cb) {
   var config = require('./webpack.dist.config');
   config.entry.app = paths.entry;
 

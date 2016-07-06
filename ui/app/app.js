@@ -9,7 +9,7 @@ import 'script!ml-search-ng/dist/ml-search-ng';
 import 'script!ng-toast';
 
 //import uiRouter from 'angular-ui-router';
-//import Common from './common/common';
+import Common from './common/common';
 import Components from './components/components';
 import AppComponent from './app.component';
 
@@ -20,7 +20,7 @@ import '../styles/main.less';
 
 angular.module('app', [
   routes,
-  //Common,
+  Common,
   Components,
   'ml.search.tpls'
 ])

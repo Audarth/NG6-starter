@@ -13,7 +13,7 @@ module.exports = {
       loader: 'ng-annotate!babel'
     }, {
       test: /\.html$/,
-      loader: 'raw'
+      loader: 'html'
     }, {
       test: /\.styl$/,
       loader: 'style!css!stylus'
@@ -27,20 +27,14 @@ module.exports = {
       test: /\.css$/,
       loader: 'style!css'
     }, {
-      test: /\.(png)$/,
-      loader: 'url-loader?limit=100000'
+      test: /\.(jpe?g|png|gif)$/i,
+      loader: 'file'
     }, {
-      test: /\.woff(2)?(\?v=\d+\.\d+\.\d+)?$/,
-      loader: "url?limit=10000&mimetype=application/font-woff"
+      test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+      loader: 'url-loader?limit=10000&mimetype=application/font-woff'
     }, {
-      test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,
-      loader: "url?limit=10000&mimetype=application/octet-stream"
-    }, {
-      test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
-      loader: "file"
-    }, {
-      test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
-      loader: "url?limit=10000&mimetype=image/svg+xml"
+      test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+      loader: 'file'
     }]
   },
   plugins: [

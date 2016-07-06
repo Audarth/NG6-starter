@@ -25,6 +25,7 @@
     "gulp-jshint": "^2.0.1",
     "highcharts": "^4.2",
     "highlightjs": "~8.7.0",
+    "html-loader": "^0.4.3",
     "jquery": "~2.1.4",
     "jshint": "^2.9.2",
     "less": "^2.7.1",
