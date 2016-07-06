@@ -6,3 +6,14 @@ node_modules
 *.log
 dist/
 typings/
+bower_components
+coverage
+ui/fonts
+ui/styles/*.css
+deploy/local.properties
+local.json
+ecosystem.json
+*.pid
+.idea/
+*.sublime-project
+*.sublime-workspace

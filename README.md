@@ -1,3 +1,37 @@
+# Marklogic es6 slush node prototype
+
+This is a prototype seeking to make updates to [https://github.com/marklogic/slush-marklogic-node](https://github.com/marklogic/slush-marklogic-node "slush-marklogic-node") using the features and practices shown in [https://github.com/AngularClass/NG6-starter](https://github.com/AngularClass/NG6-starter).
+
+# Running the application
+
+    ./ml local bootstrap
+    ./ml local deploy modules
+
+On Windows, that would be:
+
+    ml.bat local bootstrap
+    ml.bat local deploy modules
+
+Install additional dependencies using npm:
+
+    npm install
+
+To run in dev mode:
+
+    gulp serve # this will watch the ui files for changes, compile and bundle them using webpack, and run the node server
+
+To run in dist mode, first build the minified bundled files with:
+
+	gulp webpack
+
+And run with either:
+
+	node boot.js
+
+Or if you want to run with pm2
+
+	pm2 start ecosystem.json
+
 <p align="center">
   <a href="https://angularclass.com" target="_blank">
     <img src="https://cloud.githubusercontent.com/assets/1016365/9864650/93a5660a-5b00-11e5-8716-a0d538d12913.png" alt="ng6-starter" width="480px;" >
