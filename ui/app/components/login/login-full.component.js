@@ -1,10 +1,10 @@
-import LoginFullCtrl from './login-full.controller';
+import controller from './login-full.controller';
 
 import template from './login-full.html';
 
 const component = {
   bindings: {},
-  controller: LoginFullCtrl,
+  controller: controller,
   template: template
 };
 

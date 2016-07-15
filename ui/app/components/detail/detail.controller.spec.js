@@ -1,37 +1,75 @@
 /* jshint -W117, -W030 */
-(function () {
-  'use strict';
+import Module from './detail';
 
-  describe('Controller: DetailCtrl', function () {
+import Controller from './detail.controller';
+import Component from './detail.component';
+import Template from './detail.html';
 
-    var controller;
-    var doc;
+describe('Detail', () => {
+  let $rootScope, $stateParams, controller, scope;
+  let doc;
 
-    beforeEach(function() {
-      bard.appModule('app.detail');
-      bard.inject('$controller', '$rootScope');
-    });
+  beforeEach(window.module(Module));
 
-    beforeEach(function () {
-      // stub the document
-      var headers = function() { return 'application/json'; };
-      doc = {
-        headers: headers,
-        data: {
-          name: 'hi'
-        }
-      };
-      controller = $controller('DetailCtrl', {}, { doc: doc });
-      $rootScope.$apply();
-    });
+  beforeEach(inject((_$rootScope_, _$stateParams_) => {
+    $rootScope = _$rootScope_;
+    $stateParams = _$stateParams_;
+    scope = $rootScope.$new();
 
-    it('should be created successfully', function () {
+  }));
+
+  beforeEach(() => {
+    // stub the current user
+    $stateParams.uri = '/test/';
+
+    controller = new Controller($stateParams);
+
+    var headers = 'application/json';
+    doc = {
+      headers: headers,
+      data: {
+        name: 'hi'
+      }
+    };
+
+    controller.doc = doc;
+  });
+
+  describe('Module', () => {
+    // top-level specs: i.e., routes, injection, naming
+  });
+
+  describe('Controller', () => {
+    // controller specs
+    it('should be created successfully', function() {
       expect(controller).to.be.defined;
     });
 
     it('should have the doc data we gave it', function() {
-      expect(controller.doc).to.eq(doc.data);
+      expect(controller.doc.headers).to.eq('application/json');
+      expect(controller.doc.data).to.eq(doc.data);
     });
 
+    it('should have correct uri', function() {
+      expect(controller.$stateParams.uri).to.eq('/test/');
+    });
   });
-}());
+
+  describe('Template', () => {
+    // template specs
+    // tip: use regex to ensure correct bindings are used e.g., {{  }}
+  });
+
+  describe('Component', () => {
+    // component/directive specs
+    let component = Component;
+
+    it('includes the intended template', () => {
+      expect(component.template).to.equal(Template);
+    });
+
+    it('invokes the right controller', () => {
+      expect(component.controller).to.equal(Controller);
+    });
+  });
+});

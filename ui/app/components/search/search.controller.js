@@ -1,30 +1,36 @@
 import searchResultsTemplate from './search-results.html';
 
-SearchCtrl.$inject = ['$scope', '$location', 'userService', 'MLSearchFactory'];
+import MLSearchController from 'exports?MLSearchController!ml-search-ng/dist/ml-search-ng';
 
-// inherit from MLSearchController
-var superCtrl = MLSearchController.prototype;
-SearchCtrl.prototype = Object.create(superCtrl);
+class SearchCtrl extends MLSearchController {
+  constructor($scope, $location, userService, searchFactory) {
 
-function SearchCtrl($scope, $location, userService, searchFactory) {
-  var ctrl = this;
+    super($scope, $location, searchFactory.newContext());
 
-  superCtrl.constructor.call(ctrl, $scope, $location, searchFactory.newContext());
+    this.$scope = $scope;
+    this.$location = $location;
+    this.userService = userService;
+    this.searchFactory = searchFactory;
 
-  ctrl.init();
+    this.init();
 
-  //retrieve and insert searchResults template
-  ctrl.searchResultsTemplate = searchResultsTemplate;
+    //console.log(this);
 
-  ctrl.setSnippet = function(type) {
-    ctrl.mlSearch.setSnippet(type);
-    ctrl.search();
-  };
+    //retrieve and insert searchResults template
+    this.searchResultsTemplate = searchResultsTemplate;
 
-  $scope.$watch(userService.currentUser, function(newValue) {
-    ctrl.currentUser = newValue;
-  });
+    this.$scope.$watch(this.userService.currentUser, (newValue, oldValue) => {
+      this.currentUser = newValue;
+    });
+  }
+
+  setSnippet(type) {
+    this.mlSearch.setSnippet(type);
+    this.search();
+  }
 }
+
+SearchCtrl.$inject = ['$scope', '$location', 'userService', 'MLSearchFactory'];
 
 export
 default SearchCtrl;

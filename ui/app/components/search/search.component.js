@@ -1,9 +1,9 @@
 import template from './search.html';
-import SearchCtrl from './search.controller';
+import controller from './search.controller';
 
 const component = {
   bindings: {},
-  controller: SearchCtrl,
+  controller: controller,
   template: template
 };
 

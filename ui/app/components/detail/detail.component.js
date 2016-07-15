@@ -1,4 +1,4 @@
-import DetailCtrl from './detail.controller';
+import controller from './detail.controller';
 
 import template from './detail.html';
 
@@ -6,7 +6,7 @@ const component = {
   bindings: {
     doc: '<'
   },
-  controller: DetailCtrl,
+  controller: controller,
   template: template
 };
 

@@ -1,40 +1,69 @@
-module.exports = function (config) {
+/*jshint node: true */
+module.exports = function(config) {
   config.set({
     // base path used to resolve all patterns
     basePath: '',
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['mocha', 'chai'],
+    frameworks: ['mocha', 'chai', 'sinon', 'chai-sinon'],
 
     // list of files/patterns to load in the browser
-    files: [{ pattern: 'spec.bundle.js', watched: false }],
+    files: [{
+      pattern: 'spec.bundle.js',
+      watched: false
+    }],
 
     // files to exclude
     exclude: [],
 
     plugins: [
-      require("karma-chai"),
-      require("karma-chrome-launcher"),
-      require("karma-mocha"),
-      require("karma-mocha-reporter"),
-      require("karma-sourcemap-loader"),
-      require("karma-webpack")
+      require('karma-chai'),
+      require('karma-chrome-launcher'),
+      require('karma-mocha'),
+      require('karma-mocha-reporter'),
+      require('karma-sourcemap-loader'),
+      require('karma-chai-sinon'),
+      require('karma-sinon'),
+      require('karma-webpack'),
+      require('karma-phantomjs-launcher')
     ],
 
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
-    preprocessors: { 'spec.bundle.js': ['webpack', 'sourcemap'] },
+    preprocessors: {
+      'spec.bundle.js': ['webpack', 'sourcemap']
+    },
 
     webpack: {
       devtool: 'inline-source-map',
       module: {
-        loaders: [
-          { test: /\.js/, exclude: [/app\/lib/, /node_modules/], loader: 'babel' },
-          { test: /\.html/, loader: 'raw' },
-          { test: /\.styl$/, loader: 'style!css!stylus' },
-          { test: /\.css$/, loader: 'style!css' }
-        ]
+        loaders: [{
+          test: /\.js$/,
+          exclude: [/app\/lib/, /node_modules/],
+          loader: 'ng-annotate!babel'
+        }, {
+          test: /\.html$/,
+          loader: 'html'
+        }, {
+          test: /\.styl$/,
+          loader: 'style!css!stylus'
+        }, {
+          test: /\.less$/,
+          loader: 'css!less'
+        }, {
+          test: /\.css$/,
+          loader: 'style!css'
+        }, {
+          test: /\.(jpe?g|png|gif)$/i,
+          loader: 'file'
+        }, {
+          test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+          loader: 'url-loader?limit=10000&mimetype=application/font-woff'
+        }, {
+          test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+          loader: 'file'
+        }]
       }
     },
 
@@ -56,13 +85,13 @@ module.exports = function (config) {
     logLevel: config.LOG_INFO,
 
     // toggle whether to watch files and rerun tests upon incurring changes
-    autoWatch: false,
+    autoWatch: true,
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['Chrome'],
+    browsers: ['PhantomJS'],
 
     // if true, Karma runs tests once and exits
-    singleRun: true
+    singleRun: false
   });
 };

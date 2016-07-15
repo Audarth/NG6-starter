@@ -1,12 +1,5 @@
 import angular from 'angular';
 
-//run dependencies that haven't been designed for npm/imports globally as if they were in a script tag and load if necessary
-import 'script!ml-search-ng/dist/ml-search-ng-tpls';
-import 'script!ml-common-ng/dist/ml-common-ng';
-import 'script!ml-search-ng/dist/ml-search-ng';
-
-//run globally since not in a module
-import 'script!ng-toast';
 
 //import uiRouter from 'angular-ui-router';
 import Common from './common/common';

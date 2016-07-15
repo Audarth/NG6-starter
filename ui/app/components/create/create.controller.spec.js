@@ -1,38 +1,55 @@
 /* jshint -W117, -W030 */
-(function () {
-  'use strict';
+import Module from './create';
 
-  describe('Controller: CreateCtrl', function () {
+import Controller from './create.controller';
+import Component from './create.component';
+import Template from './create.html';
 
-    var controller;
-    var nextState;
+describe('Create', () => {
+  let $rootScope, controller, scope;
+  let $q, MLRest, $state, userService, toast;
 
-    beforeEach(function() {
-      bard.appModule('app.create');
-      bard.inject('$controller', '$q', '$rootScope', 'MLRest', '$state', 'userService');
+  var nextState;
 
-      bard.mockService(MLRest, {
-        createDocument: $q.when('/?uri=blah')
-      });
+  beforeEach(window.module(Module));
 
-      bard.mockService($state, {
-        go: function(state, params) {
-          nextState = {
-            state: state,
-            params: params
-          };
-        }
-      });
+  beforeEach(inject((_$controller_, _$q_, _$rootScope_, _MLRest_, _$state_, _userService_, _ngToast_) => {
+    $rootScope = _$rootScope_;
+    scope = $rootScope.$new();
+    $q = _$q_;
+    MLRest = _MLRest_;
+    $state = _$state_;
+    userService = _userService_;
+    toast = _ngToast_;
+
+    sinon.stub(MLRest, 'createDocument', () => $q.when('/?uri=blah'));
+    sinon.stub($state, 'go', function(state, params) {
+      nextState = {
+        state: state,
+        params: params
+      };
     });
 
-    beforeEach(function () {
-      // stub the current user
-      controller = $controller('CreateCtrl', { $scope: $rootScope.$new() });
-      $rootScope.$apply();
-    });
+  }));
 
-    it('should be created successfully', function () {
+  beforeEach(() => {
+    // stub the current user
+    scope = $rootScope.$new();
+    controller = new Controller(scope, MLRest, $state, userService, toast);
+  });
+
+  describe('Module', () => {
+    // top-level specs: i.e., routes, injection, naming
+  });
+
+  describe('Controller', () => {
+    // controller specs
+    it('should be created successfully', function() {
       expect(controller).to.be.defined;
+    });
+
+    it('has a person property [REMOVE]', () => { // erase if removing this.person from the controller
+      expect(controller).to.have.property('person');
     });
 
     it('should add tags', function() {
@@ -56,4 +73,25 @@
       });
     });
   });
-}());
+
+  describe('Template', () => {
+    // template specs
+    // tip: use regex to ensure correct bindings are used e.g., {{  }}
+    it('has person in template [REMOVE]', () => {
+      expect(Template).to.match(/\s?\$ctrl\.person\s?/g);
+    });
+  });
+
+  describe('Component', () => {
+    // component/directive specs
+    let component = Component;
+
+    it('includes the intended template', () => {
+      expect(component.template).to.equal(Template);
+    });
+
+    it('invokes the right controller', () => {
+      expect(component.controller).to.equal(Controller);
+    });
+  });
+});

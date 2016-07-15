@@ -1,9 +1,9 @@
 import template from './create.html';
-import CreateCtrl from './create.controller';
+import controller from './create.controller';
 
 const component = {
   bindings: {},
-  controller: CreateCtrl,
+  controller: controller,
   template: template
 };
 

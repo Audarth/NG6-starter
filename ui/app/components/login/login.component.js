@@ -1,4 +1,4 @@
-import LoginCtrl from './login.controller';
+import controller from './login.controller';
 
 import template from './login-component.html';
 
@@ -8,7 +8,7 @@ const component = {
     mode: '@',
     callback: '&'
   },
-  controller: LoginCtrl,
+  controller: controller,
   template: template
 };
 
