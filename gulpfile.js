@@ -74,29 +74,6 @@ gulp.task('plato', function(done) {
   startPlatoVisualizer(done);
 });
 
-/**
- * Compile less to css
- * @return {Stream}
- */
-gulp.task('styles', ['clean-styles'], function() {
-  log('Compiling Less --> CSS');
-
-  var less = $.less().on('error', function(e) {
-    $.util.log($.util.colors.red(e));
-    this.emit('end', e);
-  });
-
-  return gulp
-    .src(config.mainLess)
-    .pipe($.plumber()) // exit gracefully if something fails after this
-    .pipe(less)
-    .pipe($.autoprefixer({
-      browsers: ['last 2 version', '> 5%']
-    }))
-    .pipe(gulp.dest(config.temp))
-    .pipe($.if(args.verbose, $.print()));
-});
-
 var root = 'ui';
 // helper method for resolving paths
 var resolveToApp = function(glob) {
@@ -127,7 +104,7 @@ var paths = {
 
 // use webpack.config.js to build modules
 gulp.task('webpack', function(cb) {
-  var config = require('./webpack.dist.config');
+  var config = require('./webpack/webpack.dist.config');
   config.entry.app = paths.entry;
 
   webpack(config, function(err, stats) {
@@ -182,7 +159,7 @@ gulp.task('serve', function() {
 });
 
 function startBrowserSyncWebPack(env) {
-  var config = require('./webpack.dev.config');
+  var config = require('./webpack/webpack.dev.config');
   config.entry.app = [
     // this modules required to make HRM working
     // it responsible for all this webpack magic
@@ -286,14 +263,6 @@ gulp.task('images', ['clean-images'], function() {
     }))
     .pipe(gulp.dest(config.build + 'images'))
     .pipe($.if(args.verbose, $.print()));
-});
-
-/**
- * Watch for less file changes
- * @return {Stream}
- */
-gulp.task('less-watcher', function() {
-  return gulp.watch([config.less], ['styles']);
 });
 
 /**
@@ -894,22 +863,11 @@ function startBrowserSync(env, specRunner) {
 
   log('Starting BrowserSync on port ' + nodeOptions.env.APP_PORT);
 
-  // If build: watches the files, builds, and restarts browser-sync.
-  // If dev: watches less, compiles it to css, browser-sync handles reload
-  if (isDevMode(env)) {
-    gulp.watch([config.less], ['styles'])
-      .on('change', changeEvent);
-  } else {
-    gulp.watch([config.less, config.js, config.html], ['optimize', browserSync.reload])
-      .on('change', changeEvent);
-  }
-
   var options = {
     proxy: 'localhost:' + nodeOptions.env.APP_PORT,
     port: 3000,
     files: isDevMode(env) ? [
       config.client + '**/*.*',
-      '!' + config.less,
       config.temp + '**/*.css'
     ] : [],
     ghostMode: { // these are the defaults t,f,t,t
