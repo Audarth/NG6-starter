@@ -105,6 +105,5 @@ let routesModule = angular.module('app.router', [
   })
   .name;
 
-
 export
 default routesModule;

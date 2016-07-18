@@ -24,4 +24,3 @@ const login = angular
 
 export
 default login;
-//angular.module('app.login', ['app.messageBoard', 'ml.common', 'ui.bootstrap', 'ui.router']);

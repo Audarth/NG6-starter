@@ -3,7 +3,6 @@ import Module from './user';
 
 import Controller from './profile.controller';
 (function() {
-  'use strict';
 
   describe('Controller: ProfileCtrl', function() {
 

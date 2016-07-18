@@ -179,7 +179,6 @@ function LoginService($http, $uibModal, $q, $rootScope, $state,
   };
 }
 
-
 LoginService.$inject = ['$http', '$uibModal', '$q', '$rootScope', '$state',
   '$stateParams', 'messageBoardService'
 ];

@@ -87,7 +87,6 @@ var resolveToComponents = function(glob) {
 // map of all paths
 var paths = {
   js: resolveToComponents('**/*!(.spec.js).js'), // exclude spec files
-  styl: resolveToApp('**/*.styl'), // stylesheets
   html: [
     resolveToApp('**/*.html'),
     path.join(root, 'index.html')
@@ -103,7 +102,7 @@ var paths = {
 
 
 // use webpack.config.js to build modules
-gulp.task('webpack', function(cb) {
+gulp.task('webpack', ['clean'], function(cb) {
   var config = require('./webpack/webpack.dist.config');
   config.entry.app = paths.entry;
 
@@ -204,121 +203,6 @@ function startBrowserSyncWebPack(env) {
   browserSync(options);
 }
 
-
-
-/**
- * Copy fonts
- * @return {Stream}
- */
-gulp.task('fonts', ['clean-fonts'], function() {
-  log('Copying fonts');
-
-  return gulp
-    .src(config.fonts)
-    .pipe(gulp.dest(config.client + 'fonts'))
-    .pipe($.if(args.verbose, $.print()))
-    .pipe(gulp.dest(config.build + 'fonts'))
-    .pipe($.if(args.verbose, $.print()));
-});
-
-/**
-- * Copy static data like lang.json
-- * @return {Stream}
-- */
-gulp.task('statics', function() {
-  log('Copying statics');
-
-  return gulp
-    .src(config.staticdata)
-    .pipe(gulp.dest(config.build))
-    .pipe($.if(args.verbose, $.print()));
-});
-
-/**
- * Copy tinymce files
- * @return {Stream}
- */
-gulp.task('tinymce', function() {
-  log('Copying tinymce files');
-
-  return gulp
-    .src(config.tinymce, {
-      base: './bower_components/tinymce-dist'
-    })
-    .pipe(gulp.dest(config.build + 'js/'))
-    .pipe($.if(args.verbose, $.print()));
-});
-
-/**
- * Compress images
- * @return {Stream}
- */
-gulp.task('images', ['clean-images'], function() {
-  log('Compressing and copying images');
-
-  return gulp
-    .src(config.images)
-    .pipe($.imagemin({
-      optimizationLevel: 4
-    }))
-    .pipe(gulp.dest(config.build + 'images'))
-    .pipe($.if(args.verbose, $.print()));
-});
-
-/**
- * Create $templateCache from the html templates
- * @return {Stream}
- */
-gulp.task('templatecache', ['clean-code'], function() {
-  log('Creating an AngularJS $templateCache');
-
-  return gulp
-    .src(config.htmltemplates)
-    .pipe($.if(args.verbose, $.bytediff.start()))
-    .pipe($.htmlmin())
-    .pipe($.if(args.verbose, $.bytediff.stop(bytediffFormatter)))
-    .pipe($.angularTemplatecache(
-      config.templateCache.file,
-      config.templateCache.options
-    ))
-    .pipe(gulp.dest(config.temp))
-    .pipe($.if(args.verbose, $.print()));
-});
-
-/**
- * Wire-up the bower dependencies
- * @return {Stream}
- */
-gulp.task('wiredep', function() {
-  log('Wiring the bower dependencies into the html');
-
-  var wiredep = require('wiredep').stream;
-  var options = config.getWiredepDefaultOptions();
-
-  // Only include stubs if flag is enabled
-  var js = args.stubs ? [].concat(config.js, config.stubsjs) : config.js;
-
-  return gulp
-    .src(config.index)
-    .pipe(wiredep(options))
-    .pipe(inject(js, '', config.jsOrder))
-    .pipe(gulp.dest(config.client))
-    .pipe($.if(args.verbose, $.print()));
-});
-
-/**
- * Inject dependencies into index.html
- * @return {Stream}
- */
-gulp.task('inject', ['wiredep', 'styles', 'templatecache'], function() {
-  log('Wire up css into the html, after files are ready');
-
-  return gulp
-    .src(config.index)
-    .pipe(inject(config.css))
-    .pipe(gulp.dest(config.client))
-    .pipe($.if(args.verbose, $.print()));
-});
 
 /**
  * Creates a sample local.json; can be used as model for dev.json and prod.json
@@ -457,181 +341,19 @@ gulp.task('serve-specs', ['build-specs'], function(done) {
   done();
 });
 
-/**
- * Inject all the spec files into the specs.html
- * @return {Stream}
- */
-gulp.task('build-specs', ['templatecache'], function() {
-  log('building the spec runner');
 
-  var wiredep = require('wiredep').stream;
-  var templateCache = config.temp + config.templateCache.file;
-  var options = config.getWiredepDefaultOptions();
-  var specs = config.specs;
-
-  if (args.startServers) {
-    specs = [].concat(specs, config.serverIntegrationSpecs);
-  }
-  options.devDependencies = true;
-
-  return gulp
-    .src(config.specRunner)
-    .pipe(wiredep(options))
-    .pipe(inject(config.js, '', config.jsOrder))
-    .pipe(inject(config.testlibraries, 'testlibraries'))
-    .pipe(inject(config.specHelpers, 'spechelpers'))
-    .pipe(inject(specs, 'specs', ['**/*']))
-    .pipe(inject(templateCache, 'templates'))
-    .pipe(gulp.dest(config.client))
-    .pipe($.if(args.verbose, $.print()));
-});
-
-/**
- * Build everything
- * This is separate so we can run tests on
- * optimize before handling image or fonts
- * @param  {Function} done - callback when complete
- */
-gulp.task('build', ['optimize', 'images', 'fonts', 'statics', 'tinymce'], function(done) {
-  log('Building everything');
-
-  var msg = {
-    title: 'gulp build',
-    subtitle: 'Deployed to the build folder',
-    message: 'Running `gulp serve-dist`'
-  };
-  log(msg);
-  notify(msg);
-  done();
-});
-
-/**
- * Optimize all files, move to a build folder,
- * and inject them into the new index.html
- * @return {Stream}
- */
-gulp.task('optimize', ['inject', 'test'], function() {
-  log('Optimizing the js, css, and html');
-
-  // Filters are named for the gulp-useref path
-  var cssFilter = $.filter('**/*.css', {
-    restore: true
-  });
-  var jsAppFilter = $.filter('**/' + config.optimized.app, {
-    restore: true
-  });
-  var jslibFilter = $.filter('**/' + config.optimized.lib, {
-    restore: true
-  });
-
-  var templateCache = config.temp + config.templateCache.file;
-
-  var combined = gulp
-    .src(config.index)
-    .pipe($.plumber())
-    .pipe(inject(templateCache, 'templates'))
-    // Apply the concat and file replacement with useref
-    .pipe($.useref({
-      searchPath: './'
-    }))
-    // Get the css
-    .pipe(cssFilter)
-    // Take inventory of the css file names for future rev numbers
-    .pipe($.rev())
-    .pipe($.sourcemaps.init())
-    .pipe($.cssnano({
-      safe: true
-    }))
-    // write sourcemap for css
-    .pipe($.sourcemaps.write('.'))
-    .pipe(cssFilter.restore)
-    // Get the custom javascript
-    .pipe(jsAppFilter)
-    // Take inventory of the js app file name for future rev numbers
-    .pipe($.rev())
-    .pipe($.sourcemaps.init())
-    .pipe($.ngAnnotate({
-      add: true
-    }))
-    .pipe($.uglify())
-    // write sourcemap for js app
-    .pipe($.sourcemaps.write('.'))
-    .pipe(jsAppFilter.restore)
-    // Get the vendor javascript
-    .pipe(jslibFilter)
-    // Take inventory of the js lib file name for future rev numbers
-    .pipe($.rev())
-    .pipe($.sourcemaps.init())
-    .pipe($.uglify()) // another option is to override wiredep to use min files
-    // write sourcemap for js lib
-    .pipe($.sourcemaps.write('.'))
-    .pipe(jslibFilter.restore)
-    // Rename the recorded file names in the steam, and in the html to append rev numbers
-    .pipe($.revReplace())
-    // copy result to dist/, and print some logging..
-    .pipe(gulp.dest(config.build))
-    .pipe($.if(args.verbose, $.print()));
-
-  combined.on('error', console.error.bind(console));
-
-  return combined;
-});
 
 /**
  * Remove all files from the build, temp, and reports folders
  * @return {Stream}
  */
-gulp.task('clean', ['clean-fonts'], function() {
-  var files = [].concat(config.build, config.temp, config.report);
-  return clean(files);
+gulp.task('clean', function(cb) {
+  del([paths.dest]).then(function(paths) {
+    $.util.log('[clean]', paths);
+    cb();
+  });
 });
 
-/**
- * Remove all fonts from the build folder
- * @return {Stream}
- */
-gulp.task('clean-fonts', function() {
-  var files = [].concat(
-    config.build + 'fonts/**/*.*',
-    config.client + 'fonts/**/*.*'
-  );
-  return clean(files);
-});
-
-/**
- * Remove all images from the build folder
- * @return {Stream}
- */
-gulp.task('clean-images', function() {
-  return clean(config.build + 'images/**/*.*');
-});
-
-/**
- * Remove all styles from the build and temp folders
- * @return {Stream}
- */
-gulp.task('clean-styles', function() {
-  var files = [].concat(
-    config.temp + '**/*.css',
-    config.build + 'styles/**/*.css',
-    config.build + 'styles/**/*.css.map'
-  );
-  return clean(files);
-});
-
-/**
- * Remove all js and html from the build and temp folders
- * @return {Stream}
- */
-gulp.task('clean-code', function() {
-  var files = [].concat(
-    config.temp + '**/*.js',
-    config.build + 'js/**/*.js',
-    config.build + 'js/**/*.js.map',
-    config.build + '**/*.html'
-  );
-  return clean(files);
-});
 
 /**
  * Run specs once and exit
@@ -639,7 +361,7 @@ gulp.task('clean-code', function() {
  *  gulp test --startServers
  * @param  {Function} done - callback when complete
  */
-gulp.task('test', ['vet', 'templatecache'], function(done) {
+gulp.task('test', ['vet'], function(done) {
   startTests(true /*singleRun*/ , done);
 });
 
@@ -714,62 +436,6 @@ gulp.task('bump', function() {
     .pipe(gulp.dest(config.root))
     .pipe($.if(args.verbose, $.print()));
 });
-
-/**
- * When files change, log it
- * @param  {Object} event - event that fired
- */
-function changeEvent(event) {
-  var srcPattern = new RegExp('/.*(?=/' + config.source + ')/');
-  log('File ' + event.path.replace(srcPattern, '') + ' ' + event.type);
-}
-
-/**
- * Delete all files in a given path
- * @param  {Array}   files - array of paths to delete
- * @return {Stream}
- */
-function clean(files) {
-  log('Cleaning: ' + $.util.colors.blue(files));
-  return del(files)
-    .then(function(paths) {
-      if (args.verbose) {
-        log(paths.map(function(path) {
-          return path.replace(__dirname + '/', 'rm ');
-        }));
-      }
-    });
-}
-
-/**
- * Inject files in a sorted sequence at a specified inject label
- * @param   {Array} src   glob pattern for source files
- * @param   {String} label   The label name
- * @param   {Array} order   glob pattern for sort order of the files
- * @return  {Stream}
- */
-function inject(src, label, order) {
-  var options = {
-    read: false
-  };
-  if (label) {
-    options.name = 'inject:' + label;
-  }
-
-  return $.inject(orderSrc(src, order), options);
-}
-
-/**
- * Order a stream
- * @param   {Stream} src   The gulp.src stream
- * @param   {Array} order Glob array pattern
- * @return  {Stream} The ordered stream
- */
-function orderSrc(src, order) {
-  return gulp
-    .src(src)
-    .pipe($.if(order, $.order(order)));
-}
 
 /**
  * serve the code

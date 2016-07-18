@@ -1,6 +1,5 @@
 /* jshint -W117, -W030 */
 (function() {
-  'use strict';
 
   describe('Service: userService', function() {
 
@@ -23,9 +22,15 @@
       });
 
       bard.mockService($state, {
-        current: { name: 'root.search', params: {} },
+        current: {
+          name: 'root.search',
+          params: {}
+        },
         go: function(stateName, stateParams) {
-          this.current = { name: stateName, params: stateParams };
+          this.current = {
+            name: stateName,
+            params: stateParams
+          };
           return $q.when();
         },
         reload: function() {
@@ -62,22 +67,26 @@
     });
 
     it('should update the current user when logged in using loginService', function(done) {
-      $rootScope.$broadcast('loginService:login-success', {data:_user});
+      $rootScope.$broadcast('loginService:login-success', {
+        data: _user
+      });
       $rootScope.$apply(service);
 
       done();
       expect(service.currentUser().name).to.eq('bob');
     });
 
-    it('should not set user with invalid credentials', function () {
+    it('should not set user with invalid credentials', function() {
       _user.data.authenticated = false;
-      $rootScope.$broadcast('loginService:login-success', {data:_user});
+      $rootScope.$broadcast('loginService:login-success', {
+        data: _user
+      });
       $rootScope.$apply(service);
 
       expect(service.currentUser().name).to.eq(undefined);
     });
 
-    it('should clear user after logout', function () {
+    it('should clear user after logout', function() {
       $rootScope.$broadcast('loginService:logout-success');
       $rootScope.$apply(service);
 

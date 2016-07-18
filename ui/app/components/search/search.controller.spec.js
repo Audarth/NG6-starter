@@ -14,16 +14,17 @@ describe('Search', () => {
   let $q, $location, MLSearchFactory, userService, MLRest;
 
   var currentUser = null;
-
-  var results = [{
-    uri: 'abc'
-  }, {
-    uri: 'def'
-  }];
-
+  /*
+    var results = [{
+      uri: 'abc'
+    }, {
+      uri: 'def'
+    }];
+  */
   beforeEach(window.module(Module));
-
+  //jscs:disable maximumLineLength
   beforeEach(inject((_$q_, _$rootScope_, _$location_, _MLSearchFactory_, _userService_, _$httpBackend_, _MLRest_) => {
+    //jscs:enable maximumLineLength
     $q = _$q_;
     $rootScope = _$rootScope_;
     scope = $rootScope.$new();
@@ -78,7 +79,6 @@ describe('Search', () => {
           }
         }`]);
     */
-
 
   }));
 

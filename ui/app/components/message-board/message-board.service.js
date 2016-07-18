@@ -24,6 +24,5 @@ function MessageBoardService($rootScope) {
   };
 }
 
-
 export
 default MessageBoardService;

@@ -13,24 +13,24 @@ describe('Create', () => {
 
   beforeEach(window.module(Module));
 
-  beforeEach(inject((_$controller_, _$q_, _$rootScope_, _MLRest_, _$state_, _userService_, _ngToast_) => {
-    $rootScope = _$rootScope_;
-    scope = $rootScope.$new();
-    $q = _$q_;
-    MLRest = _MLRest_;
-    $state = _$state_;
-    userService = _userService_;
-    toast = _ngToast_;
+  beforeEach(inject(
+    (_$controller_, _$q_, _$rootScope_, _MLRest_, _$state_, _userService_, _ngToast_) => {
+      $rootScope = _$rootScope_;
+      scope = $rootScope.$new();
+      $q = _$q_;
+      MLRest = _MLRest_;
+      $state = _$state_;
+      userService = _userService_;
+      toast = _ngToast_;
 
-    sinon.stub(MLRest, 'createDocument', () => $q.when('/?uri=blah'));
-    sinon.stub($state, 'go', function(state, params) {
-      nextState = {
-        state: state,
-        params: params
-      };
-    });
-
-  }));
+      sinon.stub(MLRest, 'createDocument', () => $q.when('/?uri=blah'));
+      sinon.stub($state, 'go', function(state, params) {
+        nextState = {
+          state: state,
+          params: params
+        };
+      });
+    }));
 
   beforeEach(() => {
     // stub the current user
