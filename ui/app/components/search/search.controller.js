@@ -1,6 +1,8 @@
-import searchResultsTemplate from './search-results.html';
+/* globals MLSearchController: false */
+//import statement is more readable than a global but results in larger interface files since it needs to be included again
+//import MLSearchController from 'exports?MLSearchController!ml-search-ng/dist/ml-search-ng';
 
-import MLSearchController from 'exports?MLSearchController!ml-search-ng/dist/ml-search-ng';
+import searchResultsTemplate from './search-results.html';
 
 class SearchCtrl extends MLSearchController {
   constructor($scope, $location, userService, searchFactory) {
@@ -13,8 +15,6 @@ class SearchCtrl extends MLSearchController {
     this.searchFactory = searchFactory;
 
     this.init();
-
-    //console.log(this);
 
     //retrieve and insert searchResults template
     this.searchResultsTemplate = searchResultsTemplate;
