@@ -1,4 +1,4 @@
-/*jshint node: true */
+/*jshint node: true, strict: true*/
 
 'use strict';
 
@@ -102,7 +102,7 @@ var paths = {
 
 
 // use webpack.config.js to build modules
-gulp.task('webpack', ['clean'], function(cb) {
+gulp.task('build', ['clean', 'test'], function(cb) {
   var config = require('./webpack/webpack.dist.config');
   config.entry.app = paths.entry;
 
@@ -120,88 +120,6 @@ gulp.task('webpack', ['clean'], function(cb) {
     cb();
   });
 });
-
-gulp.task('serve', function() {
-
-  var env = 'local';
-
-  var debugMode = '--debug';
-  var nodeOptions = getNodeOptions(env);
-
-  nodeOptions.nodeArgs = (args.debug || args.debugBrk) ? [debugMode + '=5858'] : [];
-
-  if (args.verbose) {
-    log(nodeOptions);
-  }
-
-  return $.nodemon(nodeOptions)
-    .on('restart', ['vet'], function(ev) {
-      log('*** nodemon restarted');
-      log('files changed:\n' + ev);
-      setTimeout(function() {
-        browserSync.notify('reloading now ...');
-        browserSync.reload({
-          stream: false
-        });
-      }, config.browserReloadDelay);
-    })
-    .on('start', function() {
-      log('*** nodemon started');
-      startBrowserSyncWebPack(env);
-    })
-    .on('crash', function() {
-      log('*** nodemon crashed: script crashed for some reason');
-    })
-    .on('exit', function() {
-      log('*** nodemon exited cleanly');
-    });
-});
-
-function startBrowserSyncWebPack(env) {
-  var config = require('./webpack/webpack.dev.config');
-  config.entry.app = [
-    // this modules required to make HRM working
-    // it responsible for all this webpack magic
-    'webpack-hot-middleware/client?reload=true',
-    // application entry point
-  ].concat(paths.entry);
-
-  var compiler = webpack(config);
-
-  var nodeOptions = getNodeOptions(env);
-
-  if (args.nosync || browserSync.active) {
-    return;
-  }
-
-  log('Starting BrowserSync on port ' + nodeOptions.env.APP_PORT);
-
-  var options = {
-    proxy: 'localhost:' + nodeOptions.env.APP_PORT,
-    port: 3000,
-    notify: true,
-    reloadDelay: 0, //1000
-    ui: false,
-    open: false,
-    /*server: {
-      baseDir: root
-    },*/
-    middleware: [
-      historyApiFallback(),
-      webpackDevMiddelware(compiler, {
-        stats: {
-          colors: colorsSupported,
-          chunks: false,
-          modules: false
-        },
-        publicPath: config.output.publicPath
-      }),
-      webpachHotMiddelware(compiler)
-    ]
-  };
-
-  browserSync(options);
-}
 
 
 /**
@@ -332,18 +250,6 @@ gulp.task('add-deploy-target', function(done) {
 });
 
 /**
- * Run the spec runner
- * @param  {Function} done - callback when complete
- */
-gulp.task('serve-specs', ['build-specs'], function(done) {
-  log('run the spec runner');
-  serve('local' /* env */ , true /* specRunner */ );
-  done();
-});
-
-
-
-/**
  * Remove all files from the build, temp, and reports folders
  * @return {Stream}
  */
@@ -382,7 +288,7 @@ gulp.task('autotest', function(done) {
  * --nosync
  * @return {Stream}
  */
-gulp.task('serve-local', ['inject', 'fonts'], function() {
+gulp.task('serve-local', function() {
   return serve('local' /*env*/ );
 });
 
@@ -516,11 +422,17 @@ function getNodeOptions(env) {
   };
 }
 
-/**
- * Start BrowserSync
- * --nosync will avoid browserSync
- */
-function startBrowserSync(env, specRunner) {
+function startBrowserSync(env) {
+  var config = require('./webpack/webpack.dev.config');
+  config.entry.app = [
+    // this modules required to make HRM working
+    // it responsible for all this webpack magic
+    'webpack-hot-middleware/client?reload=true',
+    // application entry point
+  ].concat(paths.entry);
+
+  var compiler = webpack(config);
+
   var nodeOptions = getNodeOptions(env);
 
   if (args.nosync || browserSync.active) {
@@ -532,9 +444,24 @@ function startBrowserSync(env, specRunner) {
   var options = {
     proxy: 'localhost:' + nodeOptions.env.APP_PORT,
     port: 3000,
-    files: isDevMode(env) ? [
-      config.client + '**/*.*',
-      config.temp + '**/*.css'
+    notify: true,
+    reloadDelay: 0, //1000
+    ui: false,
+    open: true,
+    /*server: {
+      baseDir: root
+    },*/
+    middleware: isDevMode(env) ? [
+      historyApiFallback(),
+      webpackDevMiddelware(compiler, {
+        stats: {
+          colors: colorsSupported,
+          chunks: false,
+          modules: false
+        },
+        publicPath: config.output.publicPath
+      }),
+      webpachHotMiddelware(compiler)
     ] : [],
     ghostMode: { // these are the defaults t,f,t,t
       clicks: true,
@@ -545,14 +472,8 @@ function startBrowserSync(env, specRunner) {
     injectChanges: true,
     logFileChanges: true,
     logLevel: 'debug',
-    logPrefix: 'gulp-patterns',
-    notify: true,
-    reloadDelay: 0, //1000
-    ui: false
+    logPrefix: 'gulp-patterns'
   };
-  if (specRunner) {
-    options.startPath = config.specRunnerFile;
-  }
 
   browserSync(options);
 }
@@ -638,29 +559,6 @@ function startTests(singleRun, done) {
 }
 
 /**
- * Formatter for bytediff to display the size changes after processing
- * @param  {Object} data - byte data
- * @return {String}    Difference in bytes, formatted
- */
-function bytediffFormatter(data) {
-  var difference = (data.savings > 0) ? ' smaller.' : ' larger.';
-  return data.fileName + ' went from ' +
-    (data.startSize / 1000).toFixed(2) + ' kB to ' +
-    (data.endSize / 1000).toFixed(2) + ' kB and is ' +
-    formatPercent(1 - data.percent, 2) + '%' + difference;
-}
-
-/**
- * Format a number as a percentage
- * @param  {Number} num     Number to format as a percent
- * @param  {Number} precision Precision of the decimal
- * @return {String}       Formatted perentage
- */
-function formatPercent(num, precision) {
-  return (num * 100).toFixed(precision);
-}
-
-/**
  * Log a message or series of messages using chalk's blue color.
  * Can pass in a string, object or array.
  */
@@ -674,20 +572,6 @@ function log(msg) {
   } else {
     $.util.log($.util.colors.blue(msg));
   }
-}
-
-/**
- * Show OS level notification using node-notifier
- */
-function notify(options) {
-  var notifier = require('node-notifier');
-  var notifyOptions = {
-    sound: 'Bottle',
-    contentImage: path.join(__dirname, 'gulp.png'),
-    icon: path.join(__dirname, 'gulp.png')
-  };
-  _.assign(notifyOptions, options);
-  notifier.notify(notifyOptions);
 }
 
 module.exports = gulp;

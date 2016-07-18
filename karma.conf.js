@@ -22,6 +22,8 @@ module.exports = function(config) {
       require('karma-chrome-launcher'),
       require('karma-mocha'),
       require('karma-mocha-reporter'),
+      require('karma-coverage'),
+      require('karma-notify-reporter'),
       require('karma-sourcemap-loader'),
       require('karma-chai-sinon'),
       require('karma-sinon'),
@@ -38,32 +40,48 @@ module.exports = function(config) {
     webpack: {
       devtool: 'inline-source-map',
       module: {
-        loaders: [{
+        /*\
+        preLoaders: [{
           test: /\.js$/,
-          exclude: [/app\/lib/, /node_modules/],
-          loader: 'ng-annotate!babel'
-        }, {
-          test: /\.html$/,
-          loader: 'html'
-        }, {
-          test: /\.styl$/,
-          loader: 'style!css!stylus'
-        }, {
-          test: /\.less$/,
-          loader: 'css!less'
-        }, {
-          test: /\.css$/,
-          loader: 'style!css'
-        }, {
-          test: /\.(jpe?g|png|gif)$/i,
-          loader: 'file'
-        }, {
-          test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-          loader: 'url-loader?limit=10000&mimetype=application/font-woff'
-        }, {
-          test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-          loader: 'file'
-        }]
+          loader: 'isparta'
+        }],
+        */
+        loaders: [
+          // transpile all files except modules and source files which are need be tested
+          {
+            test: /\.js$/,
+            exclude: [/app((?!\.spec).)*$/, /node_modules/],
+            loader: 'ng-annotate!babel'
+          },
+          // transpile and instrument only testable files with isparta
+          // this allows us to generate a coverage report of all files
+          {
+            test: /\.js$/,
+            include: [/app((?!\.spec).)*$/],
+            loader: 'isparta'
+          }, {
+            test: /\.html$/,
+            loader: 'html'
+          }, {
+            test: /\.styl$/,
+            loader: 'style!css!stylus'
+          }, {
+            test: /\.less$/,
+            loader: 'css!less'
+          }, {
+            test: /\.css$/,
+            loader: 'style!css'
+          }, {
+            test: /\.(jpe?g|png|gif)$/i,
+            loader: 'file'
+          }, {
+            test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+            loader: 'url-loader?limit=10000&mimetype=application/font-woff'
+          }, {
+            test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+            loader: 'file'
+          }
+        ]
       }
     },
 
@@ -72,8 +90,23 @@ module.exports = function(config) {
     },
 
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['mocha'],
+    reporters: ['mocha', 'coverage', 'notify'],
 
+    coverageReporter: {
+      // dir: report + 'coverage',
+      reporters: [
+        // reporters not supporting the `file` property
+        {
+          type: 'html',
+          subdir: 'report-html'
+        }, {
+          type: 'lcov',
+          subdir: 'report-lcov'
+        }, {
+          type: 'text-summary'
+        } //, subdir: '.', file: 'text-summary.txt'}
+      ]
+    },
     // web server port
     port: 9876,
 
