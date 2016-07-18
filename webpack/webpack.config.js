@@ -27,13 +27,16 @@ module.exports = {
       test: /\.css$/,
       loader: 'style!css'
     }, {
-      test: /\.(jpe?g|png|gif)$/i,
-      loader: 'file'
+      test: /\.(gif|png|jpe?g|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/i,
+      loaders: [
+        'file?hash=sha512&digest=hex&name=[hash].[ext]',
+        'image-webpack'
+      ]
     }, {
       test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
       loader: 'url-loader?limit=10000&mimetype=application/font-woff'
     }, {
-      test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+      test: /\.(ttf|eot)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
       loader: 'file'
     }]
   },
@@ -56,5 +59,18 @@ module.exports = {
       }
     }),
     new ExtractTextPlugin('styles.css')
-  ]
+  ],
+  imageWebpackLoader: {
+    pngquant: {
+      quality: "65-90",
+      speed: 4
+    },
+    svgo: {
+      plugins: [{
+        removeViewBox: false
+      }, {
+        removeEmptyAttrs: false
+      }]
+    }
+  }
 };
