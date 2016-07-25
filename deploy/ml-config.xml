@@ -475,18 +475,14 @@
       </collections>
       <privileges>
         <privilege>
-          <privilege-name>xdmp:value</privilege-name>
+          <privilege-name>rest-reader</privilege-name>
         </privilege>
+        <!-- remove the rest-writer privilege if read-only access is required -->
         <privilege>
-          <privilege-name>xdmp:add-response-header</privilege-name>
-        </privilege>
-        <privilege>
-          <privilege-name>xdmp:invoke</privilege-name>
-        </privilege>
-        <privilege>
-          <privilege-name>xdmp:with-namespaces</privilege-name>
+          <privilege-name>rest-writer</privilege-name>
         </privilege>
       </privileges>
+
     </role>
   </roles>
   <users xmlns="http://marklogic.com/xdmp/security">

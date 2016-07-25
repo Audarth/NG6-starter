@@ -27,7 +27,7 @@ module.exports = {
       test: /\.css$/,
       loader: 'style!css'
     }, {
-      test: /\.(gif|png|jpe?g|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/i,
+      test: /\.(gif|png|jpe?g|svg|ico)(\?v=[0-9]\.[0-9]\.[0-9])?$/i,
       loaders: [
         'file?hash=sha512&digest=hex&name=[hash].[ext]',
         'image-webpack'
@@ -47,6 +47,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: 'ui/index.html',
       inject: 'body',
+      favicon: 'ui/images/favicon.ico',
       hash: true
     }),
 

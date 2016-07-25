@@ -1,0 +1,33 @@
+{
+  "apps": [{
+    "name": "test",
+    "script": "./node-server/node-app.js",
+    "watch": true,
+    "restart_delay": 4000,
+    "env": {
+      "NODE_ENV": "local"
+    },
+    "env_local": {
+      "NODE_ENV": "local"
+    },
+    "env_dev": {
+      "NODE_ENV": "dev"
+    },
+    "env_prod": {
+      "NODE_ENV": "prod"
+    }
+  }],
+  "deploy": {
+    "prod": {
+      "key": "~/.ssh/id_rsa",
+      "user": "nbakshi",
+      "host": [
+        "localhost"
+      ],
+      "ref": "origin/master",
+      "repo": "https://github.com/Audarth/NG6-starter.git",
+      "path": "/space/projects/test",
+      "post-deploy": "npm install; bower install; gulp build"
+    }
+  }
+}
